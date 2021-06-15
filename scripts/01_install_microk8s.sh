@@ -13,4 +13,6 @@ sudo microk8s enable ingress
 
 # To view the pods in this ingress controller:
 # microk8s kubectl get pods -n ingress \
-#   -l name=nginx-ingress-microk8s
+#   -l name=nginx-ingress-
+
+# official docs: https://kubernetes.github.io/ingress-nginx/
