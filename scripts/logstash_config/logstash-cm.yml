@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-configmap
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    path.config: /usr/share/logstash/pipeline
+  logstash.conf: |
+    input {
+        rabbitmq {
+            queue => "elk-log"
+            host => "rasa-x-1623858303-rabbit"
+            port => 15672
+            user => "user"
+            password => "asdf123123joijasdf098"
+            durable => true
+        }
+    }
+    filter {
+        if [@metadata][rabbitmq_properties][timestamp] {
+            date {
+            match => ["[@metadata][rabbitmq_properties][timestamp]", "UNIX"]
+            }
+        }
+    }
+    output {
+      elasticsearch {
+        index => "logstash-%{[@metadata][beat]}"
+        hosts => ["${ES_HOSTS}"]
+        user => "${ES_USER}"
+        password => "${ES_PASSWORD}"
+        cacert => '/etc/logstash/certificates/ca.crt'
+      }
+    }
