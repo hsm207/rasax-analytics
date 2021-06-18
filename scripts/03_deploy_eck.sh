@@ -10,8 +10,8 @@ microk8s kubectl apply -f https://download.elastic.co/downloads/eck/1.6.0/all-in
 
 
 # The Elasticsearch cluster
-# creates in the default namespace
-cat <<EOF | microk8s kubectl apply -f -
+# creates in the in the same Rasa X namespace
+cat <<EOF | microk8s kubectl --namespace $RASAX_NS apply -f -
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
@@ -35,8 +35,12 @@ PASSWORD=$(microk8s kubectl get secret quickstart-es-elastic-user -o go-template
 
 
 # The Kibana instance
-# also creates it in the default namespace
-cat <<EOF | microk8s kubectl apply -f -
+# also creates it in the same Rasa X namespace
+# adjust from quickstart guide to make it reachable from /kibana path
+# ref:
+# * https://discuss.elastic.co/t/expose-kibana-behind-a-subpath-using-gce-ingress/267987
+# * https://github.com/elastic/cloud-on-k8s/issues/2118
+cat <<EOF | microk8s kubectl -n $RASAX_NS apply -f -
 apiVersion: kibana.k8s.elastic.co/v1
 kind: Kibana
 metadata:
@@ -44,8 +48,24 @@ metadata:
 spec:
   version: 7.13.2
   count: 1
+  config:
+    server:
+      basePath: "/kibana"
+      rewriteBasePath: true
   elasticsearchRef:
     name: quickstart
+  http:
+    tls:
+      selfSignedCertificate:
+        disabled: true
+  podTemplate:
+    spec:
+      containers:
+      - name: kibana
+        readinessProbe:
+          httpGet:
+            path: /kibana/login
+            port: 5601
 EOF
 
 # display the kibana UI password (username is elastic)

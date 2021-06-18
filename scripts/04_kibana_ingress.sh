@@ -1,6 +1,7 @@
 #!/bin/bash
 
-cat <<EOF | microk8s kubectl apply -f -
+# access the Kibana UI with /kibana because / is for Rasa X UI
+cat <<EOF | microk8s kubectl -n $RASAX_NS apply -f -
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -9,12 +10,12 @@ spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: /kibana
         pathType: Prefix
         backend:
           service:
             name: quickstart-kb-http
             port:
-             number: 5601
+              number: 5601
 
 EOF

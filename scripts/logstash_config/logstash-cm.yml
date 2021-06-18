@@ -10,10 +10,10 @@ data:
     input {
         rabbitmq {
             queue => "elk-log"
-            host => "rasa-x-1623858303-rabbit"
+            host => "demo-rasa-x-ee-rabbit"
             port => 15672
             user => "user"
-            password => "asdf123123joijasdf098"
+            password => "safe_credential"
             durable => true
         }
     }
