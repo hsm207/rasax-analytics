@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # from: https://microk8s.io/docs
-sudo snap install microk8s --classic --channel=1.21
+sudo snap install microk8s --classic --channel=latest/stable
 sudo usermod -a -G microk8s $USER
 sudo chown -f -R $USER ~/.kube
 
